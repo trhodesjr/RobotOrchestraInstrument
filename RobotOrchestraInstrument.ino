@@ -107,26 +107,27 @@ void playNotes() {
 // pressNotes() is used to set + move the servos specified by the serial messages
 void pressNotes() {
   byte_count = Serial.available();              // check if message available
-  if (byte_count%2 == 0) {
-    for (int b = 0; b < byte_count/2; b++) {  // read no
+  if (byte_count % 2 == 0) {
+    for (int b = 0; b < byte_count / 2; b++) { // read no
       midi_note = Serial.read();
       midi_vel = Serial.read();
       setNotePosition(midi_note, midi_vel);     // set note position
     }
-    playNotes();                                // play note  
+    playNotes();                                // play note
   }
 }
 
 // setNotePosition() is used to set note position specified by input parameters
 void setNotePosition(byte note, byte vel) {
   note_index = getNoteIndex(note);
-  if (note_index >= 0) {
-    if (vel > 0)
-      note_position[note_index] = on_position[note_index];
-    else
-      note_position[note_index] = off_position[note_index];
-  }
+  if (note_index < 0) // invalid note index
+    return;
+  else if (vel > 0)
+    note_position[note_index] = on_position[note_index];
+  else
+    note_position[note_index] = off_position[note_index];
 }
+
 
 // getNoteIndex() returns the note array index for a given midi note
 byte getNoteIndex(byte note) {
@@ -139,5 +140,7 @@ byte getNoteIndex(byte note) {
       return E;
     case 79:
       return G;
+    default:      // midi note not playable
+      return -1;  
   }
 }
