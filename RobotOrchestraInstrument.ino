@@ -8,10 +8,10 @@ enum Modes {
 };
 
 enum PlayableNotes {
-  A,  // Midi #69
-  G,  // Midi #67
-  F,  // Midi #65
-  E,  // Midi #64
+  C,  // Midi #72
+  D,  // Midi #74
+  E,  // Midi #76
+  G,  // Midi #79
   NUMNOTES  // add playable notes above this line
 };
 
@@ -28,23 +28,24 @@ byte midi_vel;                  // Midi velocity number (greater than 0 is on, e
 
 /************** Configuration Parameters **************/
 void initialize() {
-  mode = PLAY;                  // Set the mode of the Arduino (All notes on, All notes off, Play incoming notes)
+  mode = PLAY;                 // Set the mode of the Arduino (All notes on, All notes off, Play incoming notes)
 
-  on_position[A] = 80;          // Note on position
-  on_position[G] = 80;
-  on_position[F] = 80;
-  on_position[E] = 80;
+  on_position[C] = 95;         // Note on position
+  on_position[D] = 95;
+  on_position[E] = 85;
+  on_position[G] = 90;
 
-  off_position[A] = 100;        // Note off position
-  off_position[G] = 100;
-  off_position[F] = 100;
-  off_position[E] = 100;
+  off_position[C] = 90;        // Note off position
+  off_position[D] = 88;
+  off_position[E] = 93;
+  off_position[G] = 95;
 
-  note_pin[A] = 2;              // pin the servo is connected to on Arduino
-  note_pin[G] = 3;
-  note_pin[F] = 4;
-  note_pin[E] = 5;
+  note_pin[C] = 11;            // Pin the servo is connected to on Arduino
+  note_pin[D] = 5;
+  note_pin[E] = 6;
+  note_pin[G] = 9;
 }
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -54,6 +55,7 @@ void setup() {
   while (!Serial) {
     ;
   }
+  allNotesOff();
 }
 
 void loop() {
@@ -78,7 +80,7 @@ void loop() {
 // play() is used to play notes it receives from the main computer
 void play() {
   pressNotes();
-  delay(20);        // change this as needed
+  delay(100);        // change this as needed
   allNotesOff();    // if your instruement can sustain notes, remove this and previous line
 }
 
@@ -105,8 +107,8 @@ void playNotes() {
 // pressNotes() is used to set + move the servos specified by the serial messages
 void pressNotes() {
   byte_count = Serial.available();              // check if message available
-  if (byte_count > 0) {
-    for (int b = 0; b < byte_count / 2; b++) {  // read note
+  if (byte_count%2 == 0) {
+    for (int b = 0; b < byte_count/2; b++) {  // read no
       midi_note = Serial.read();
       midi_vel = Serial.read();
       setNotePosition(midi_note, midi_vel);     // set note position
@@ -118,7 +120,7 @@ void pressNotes() {
 // setNotePosition() is used to set note position specified by input parameters
 void setNotePosition(byte note, byte vel) {
   note_index = getNoteIndex(note);
-  if (note_index > 0) {
+  if (note_index >= 0) {
     if (vel > 0)
       note_position[note_index] = on_position[note_index];
     else
@@ -129,15 +131,13 @@ void setNotePosition(byte note, byte vel) {
 // getNoteIndex() returns the note array index for a given midi note
 byte getNoteIndex(byte note) {
   switch (note) {
-    case 69:
-      return A;
-    case 67:
-      return G;
-    case 65:
-      return F;
-    case 64:
+    case 72:
+      return C;
+    case 74:
+      return D;
+    case 76:
       return E;
-    default:
-      return -1;
+    case 79:
+      return G;
   }
 }
