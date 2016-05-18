@@ -128,10 +128,17 @@ void setNotePosition(byte note, byte vel) {
     note_position[note_index] = off_position[note_index];
 }
 
+void testConnection(byte note) {
+  delay(750);
+  Serial.write(note);  
+}
 
 // getNoteIndex() returns the note array index for a given midi note
 byte getNoteIndex(byte note) {
   switch (note) {
+    case 99:
+      testConnection(note);// Used to test connection to conductor
+      return -1;
     case 72:
       return C;
     case 74:
